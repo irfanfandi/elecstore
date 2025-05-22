@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@prisma/client": "^6.8.2",
+    "@types/bun": "latest",
+    "prisma": "^6.8.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "seed": "bun run prisma/seed.ts"
+  },
+  "dependencies": {
+    "@trpc/server": "^11.1.2",
+    "hono": "^4.7.10",
+    "slugify": "^1.6.6",
+    "ulid": "^3.0.0",
+    "zod": "^3.24.4"
+  }
+}
