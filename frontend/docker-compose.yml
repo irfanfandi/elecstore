@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  frontend:
+    build: .
+    container_name: fe-elecstore
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production

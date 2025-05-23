@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "react-router-serve build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
