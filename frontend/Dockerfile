@@ -9,6 +9,6 @@ RUN npm install --legacy-peer-deps
 
 RUN npm run build
 
-EXPOSE 5173
+EXPOSE ${PORT}
 
 CMD ["npm", "run", "start"]
