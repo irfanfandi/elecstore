@@ -1,14 +1,14 @@
 # Dockerfile
-FROM oven/bun:1
+FROM node:20-alpine
 
 WORKDIR /app
 
 COPY . .
 
-RUN bun install
+RUN npm install --legacy-peer-deps
 
-RUN bun run build
+RUN npm run build
 
 EXPOSE 5173
 
-CMD ["bun", "run", "dev"]
+CMD ["npm", "run", "start"]
