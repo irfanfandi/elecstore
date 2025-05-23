@@ -31,9 +31,9 @@ const ProductDetail = (props: Props) => {
   }
 
   return (
-    <main className="container mx-auto flex mt-24">
+    <div className="container mx-auto flex mt-24">
       <ProductDetailSection {...product} />
-    </main>
+    </div>
   );
 };
 

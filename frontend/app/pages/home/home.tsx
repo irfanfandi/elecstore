@@ -11,7 +11,7 @@ export function Home() {
   if (isLoading) return <Loading />;
 
   return (
-    <main className="container mx-auto flex mt-24">
+    <div className="container mx-auto flex mt-24">
       <Suspense fallback={<Loading />}>
         <LeftSidebar />
       </Suspense>
@@ -44,12 +44,12 @@ export function Home() {
               <h1 className="text-2xl font-bold text-gray-800 mb-4">Product Not Found</h1>
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
               {data?.map((product, index) => <ProductCard key={index} {...product} />)}
             </div>
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }

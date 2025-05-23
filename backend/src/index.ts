@@ -1,25 +1,10 @@
-import { Hono } from "hono";
-import { createHTTPHandler } from "@trpc/server/adapters/standalone";
-import { appRouter } from "./trpc/router"; // sesuaikan path ke router kamu
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { cors } from "hono/cors";
+import app from "./app";
 
-const app = new Hono();
+const port = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 
-// Buat handler sekali saja
-const handler = createHTTPHandler({
-  router: appRouter,
-  createContext: () => ({}),
+Bun.serve({
+  fetch: app.fetch,
+  port,
 });
 
-app.use("/trpc/*", cors());
-app.all("/trpc/*", (c) => {
-  return fetchRequestHandler({
-    endpoint: "/trpc",
-    req: c.req.raw, // Hono → raw Request
-    router: appRouter,
-    createContext: () => ({}),
-  });
-});
-
-export default app;
+console.log(`Server is running on http://localhost:${port}`);

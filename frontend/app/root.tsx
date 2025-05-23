@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="w-[1620px] overflow-x-auto">
         <Navbar />
-        <main className="mb-8">{children}</main>
+        <main className="mb-8 flex justify-center">{children}</main>
         <ScrollRestoration />
         <Scripts />
       </body>

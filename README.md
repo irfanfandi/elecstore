@@ -33,6 +33,7 @@ Before you begin, ensure you have the following installed:
    Create a `.env` file in the backend directory and add the necessary environment variables. Example:
    ```
    DATABASE_URL=your_database_url
+   PORT=your_port
    ```
 
 5. **Run the backend server:**
