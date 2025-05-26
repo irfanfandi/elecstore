@@ -1,78 +1,123 @@
-import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import React, { useState, useEffect } from "react";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { useFilterProduct } from "~/hooks/useFilterProduct";
+
+const categories = [
+  "ASUS",
+  "VIVO",
+  "Xiaomi",
+  "Samsung",
+  "Honor",
+  "Realme",
+  "Huawei",
+  "Infinix",
+  "OnePlus",
+  "Google",
+];
 
 export default function LeftSidebar() {
+  const { filters, setQueryParams } = useFilterProduct();
+
+  // Parse multiple categories from filters.category (comma-separated)
+  const selectedCategories = filters.category || [];
+
+  // Price filters stored in URL params as minPrice and maxPrice
+  // We use local state to handle input fields before applying filters
+  const [localMinPrice, setLocalMinPrice] = useState<string>("");
+  const [localMaxPrice, setLocalMaxPrice] = useState<string>("");
+  const [localMinOrder, setLocalMinOrder] = useState<string>("");
+
+  // On mount or filters change, update local state from query params
+  useEffect(() => {
+    setLocalMinPrice(filters.minPrice ? String(filters.minPrice) : "");
+    setLocalMaxPrice(filters.maxPrice ? String(filters.maxPrice) : "");
+    setLocalMinOrder(filters.minOrder ? String(filters.minOrder) : "");
+  }, [filters.minPrice, filters.maxPrice, filters.minOrder]);
+
+  // Toggle category selection
+  const toggleCategory = (category: string) => {
+    let newCategories: string[];
+    if (selectedCategories.includes(category)) {
+      newCategories = selectedCategories.filter((c) => c !== category);
+    } else {
+      newCategories = [...selectedCategories, category];
+    }
+
+    setQueryParams({
+      category: newCategories.length > 0 ? newCategories.join(",") : undefined,
+    });
+  };
+
+  // Apply price filter
+  const onApplyPrice = () => {
+    setQueryParams({
+      minPrice: localMinPrice || undefined,
+      maxPrice: localMaxPrice || undefined,
+    });
+  };
+
+  // Apply min order filter
+  const onApplyMinOrder = () => {
+    setQueryParams({
+      minOrder: localMinOrder || undefined,
+    });
+  };
+
+  const clearAllFilters = () => {
+    setQueryParams({
+      ...filters,
+      category: undefined,
+      minPrice: undefined,
+      maxPrice: undefined,
+      minOrder: undefined,
+      page: 1,
+    });
+    // Reset local state
+    setLocalMinPrice("");
+    setLocalMaxPrice("");
+    setLocalMinOrder("");
+  };
+
   return (
     <aside className="w-full md:w-64 border-r px-4 py-6 space-y-6 text-sm bg-white">
-      <div className="space-y-3">
-        <div className="flex items-start space-x-2">
-          <Checkbox id="merge" />
-          <div>
-            <Label htmlFor="merge" className="font-medium">
-              Merge by supplier
-            </Label>
-            <p className="text-xs text-muted-foreground">
-              Only the most relevant item from each supplier will be shown
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <h4 className="font-semibold">Store reviews</h4>
-        <p className="text-xs text-muted-foreground">Based on a 5-star rating system</p>
-        <RadioGroup defaultValue="4.0">
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="4.0" id="r1" />
-            <Label htmlFor="r1">4.0 & up</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="4.5" id="r2" />
-            <Label htmlFor="r2">4.5 & up</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="5.0" id="r3" />
-            <Label htmlFor="r3">5.0</Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="space-y-2">
-        <h4 className="font-semibold">Product features</h4>
-        <div className="flex items-center space-x-2">
-          <Checkbox id="paid-samples" />
-          <Label htmlFor="paid-samples">Paid samples</Label>
-        </div>
-      </div>
-
       <div className="space-y-2">
         <h4 className="font-semibold">Categories</h4>
-        <ul className="space-y-1 text-muted-foreground">
-          {[
-            'Used Mobile Phones',
-            '5G smartphone',
-            '3G&4G smartphone',
-            'Smart Rings',
-            'Rugged phone',
-            'Feature Phone',
-          ].map((cat) => (
-            <li key={cat}>
-              <button className="text-left hover:underline">{cat}</button>
-            </li>
+        <div className="flex flex-col space-x-2 gap-4">
+          {categories.map((category, idx) => (
+            <div className="flex gap-4" key={`${category}-${idx}`}>
+              <Checkbox
+                id={category}
+                checked={selectedCategories.includes(category)}
+                onCheckedChange={() => toggleCategory(category)}
+              />
+              <Label htmlFor={category}>{category}</Label>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
 
       <div className="space-y-2">
         <h4 className="font-semibold">Price</h4>
         <div className="flex items-center gap-2">
-          <Input placeholder="Min." className="w-full text-sm" />
+          <Input
+            placeholder="Min."
+            className="w-full text-sm"
+            type="number"
+            value={localMinPrice}
+            onChange={(e) => setLocalMinPrice(e.target.value)}
+          />
           <span>-</span>
-          <Input placeholder="Max." className="w-full text-sm" />
-          <Button size="sm" className="rounded-full px-3">
+          <Input
+            placeholder="Max."
+            className="w-full text-sm"
+            type="number"
+            value={localMaxPrice}
+            onChange={(e) => setLocalMaxPrice(e.target.value)}
+          />
+          <Button size="sm" className="rounded-full px-3" onClick={onApplyPrice}>
             OK
           </Button>
         </div>
@@ -81,11 +126,28 @@ export default function LeftSidebar() {
       <div className="space-y-2">
         <h4 className="font-semibold">Min. order</h4>
         <div className="flex gap-2">
-          <Input placeholder="e.g. 10" className="w-full text-sm" />
-          <Button size="sm" className="rounded-full px-3">
+          <Input
+            placeholder="e.g. 10"
+            className="w-full text-sm"
+            type="number"
+            value={localMinOrder}
+            onChange={(e) => setLocalMinOrder(e.target.value)}
+          />
+          <Button size="sm" className="rounded-full px-3" onClick={onApplyMinOrder}>
             OK
           </Button>
         </div>
+      </div>
+
+      <div className="mt-8 flex justify-end">
+        <Button
+          variant={"outline"}
+          size="sm"
+          className="rounded-full px-3"
+          onClick={clearAllFilters}
+        >
+          Clear All Filter
+        </Button>
       </div>
     </aside>
   );

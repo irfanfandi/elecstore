@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { createHTTPHandler } from "@trpc/server/adapters/standalone";
-import { appRouter } from "./trpc/router"; // sesuaikan path ke router kamu
+import { appRouter } from "./trpc/product/router"; // sesuaikan path ke router kamu
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { cors } from "hono/cors";
 
