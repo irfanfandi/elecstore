@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 export type SortBy = "createdAt" | "name" | "price";
 export type SortOrder = "asc" | "desc";
@@ -14,7 +14,7 @@ export const useFilterProduct = () => {
     const limit = parseInt(params.get("limit") || "8");
     const search = params.get("search") || undefined;
 
-    // categories comma separated string -> array or undefined
+    // Convert comma-separated string to array (category)
     const categoryParam = params.get("category");
     const category = categoryParam
       ? categoryParam.split(",").map(String).filter(Boolean)
@@ -28,7 +28,6 @@ export const useFilterProduct = () => {
       ? (params.get("sortOrder") as SortOrder)
       : undefined;
 
-    // New filters: minPrice, maxPrice, minOrder - parsed as numbers or undefined
     const minPriceRaw = params.get("minPrice");
     const maxPriceRaw = params.get("maxPrice");
     const minOrderRaw = params.get("minOrder");
@@ -53,13 +52,12 @@ export const useFilterProduct = () => {
     };
   }, [params]);
 
-  const setQueryParams = useMemo(() => {
-    return (newValues: Record<string, string | number | string[] | undefined>) => {
+  const setQueryParams = useCallback(
+    (newValues: Record<string, string | number | string[] | undefined>) => {
       const newParams = new URLSearchParams(params.toString());
 
       Object.entries(newValues).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== "") {
-          // For category array, convert to comma-separated string
           if (key === "category" && Array.isArray(value)) {
             if (value.length > 0) {
               newParams.set(key, value.join(","));
@@ -73,20 +71,21 @@ export const useFilterProduct = () => {
           newParams.delete(key);
         }
 
-        // Reset page when any filter (except page) is changed
         if (key !== "page") {
           newParams.set("page", "1");
         }
       });
 
-      if (location.pathname !== "/") {
-        navigate("/?" + newParams.toString(), { replace: true });
-        return;
-      }
+      const searchStr = newParams.toString();
 
-      navigate({ search: newParams.toString() });
-    };
-  }, [params, location.pathname, navigate]);
+      if (location.pathname !== "/") {
+        navigate("/?" + searchStr, { replace: true });
+      } else {
+        navigate({ search: searchStr });
+      }
+    },
+    [params, location.pathname, navigate],
+  );
 
   return {
     filters,

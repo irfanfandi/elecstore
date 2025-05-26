@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
@@ -21,52 +21,48 @@ const categories = [
 export default function LeftSidebar() {
   const { filters, setQueryParams } = useFilterProduct();
 
-  // Parse multiple categories from filters.category (comma-separated)
-  const selectedCategories = filters.category || [];
+  const selectedCategories = useMemo(() => filters.category || [], [filters.category]);
 
-  // Price filters stored in URL params as minPrice and maxPrice
-  // We use local state to handle input fields before applying filters
   const [localMinPrice, setLocalMinPrice] = useState<string>("");
   const [localMaxPrice, setLocalMaxPrice] = useState<string>("");
   const [localMinOrder, setLocalMinOrder] = useState<string>("");
 
-  // On mount or filters change, update local state from query params
   useEffect(() => {
     setLocalMinPrice(filters.minPrice ? String(filters.minPrice) : "");
     setLocalMaxPrice(filters.maxPrice ? String(filters.maxPrice) : "");
     setLocalMinOrder(filters.minOrder ? String(filters.minOrder) : "");
   }, [filters.minPrice, filters.maxPrice, filters.minOrder]);
 
-  // Toggle category selection
-  const toggleCategory = (category: string) => {
-    let newCategories: string[];
-    if (selectedCategories.includes(category)) {
-      newCategories = selectedCategories.filter((c) => c !== category);
-    } else {
-      newCategories = [...selectedCategories, category];
-    }
+  const toggleCategory = useCallback(
+    (category: string) => {
+      let newCategories: string[];
+      if (selectedCategories.includes(category)) {
+        newCategories = selectedCategories.filter((c) => c !== category);
+      } else {
+        newCategories = [...selectedCategories, category];
+      }
 
-    setQueryParams({
-      category: newCategories.length > 0 ? newCategories.join(",") : undefined,
-    });
-  };
+      setQueryParams({
+        category: newCategories.length > 0 ? newCategories.join(",") : undefined,
+      });
+    },
+    [selectedCategories, setQueryParams],
+  );
 
-  // Apply price filter
-  const onApplyPrice = () => {
+  const onApplyPrice = useCallback(() => {
     setQueryParams({
       minPrice: localMinPrice || undefined,
       maxPrice: localMaxPrice || undefined,
     });
-  };
+  }, [localMinPrice, localMaxPrice, setQueryParams]);
 
-  // Apply min order filter
-  const onApplyMinOrder = () => {
+  const onApplyMinOrder = useCallback(() => {
     setQueryParams({
       minOrder: localMinOrder || undefined,
     });
-  };
+  }, [localMinOrder, setQueryParams]);
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setQueryParams({
       ...filters,
       category: undefined,
@@ -75,11 +71,10 @@ export default function LeftSidebar() {
       minOrder: undefined,
       page: 1,
     });
-    // Reset local state
     setLocalMinPrice("");
     setLocalMaxPrice("");
     setLocalMinOrder("");
-  };
+  }, [filters, setQueryParams]);
 
   return (
     <aside className="w-full md:w-64 border-r px-4 py-6 space-y-6 text-sm bg-white">
@@ -102,21 +97,25 @@ export default function LeftSidebar() {
       <div className="space-y-2">
         <h4 className="font-semibold">Price</h4>
         <div className="flex items-center gap-2">
-          <Input
-            placeholder="Min."
-            className="w-full text-sm"
-            type="number"
-            value={localMinPrice}
-            onChange={(e) => setLocalMinPrice(e.target.value)}
-          />
+          <div className="flex flex-col w-full">
+            <Input
+              placeholder="Min."
+              className="w-full text-sm"
+              type="number"
+              value={localMinPrice}
+              onChange={(e) => setLocalMinPrice(e.target.value)}
+            />
+          </div>
           <span>-</span>
-          <Input
-            placeholder="Max."
-            className="w-full text-sm"
-            type="number"
-            value={localMaxPrice}
-            onChange={(e) => setLocalMaxPrice(e.target.value)}
-          />
+          <div className="flex flex-col w-full">
+            <Input
+              placeholder="Max."
+              className="w-full text-sm"
+              type="number"
+              value={localMaxPrice}
+              onChange={(e) => setLocalMaxPrice(e.target.value)}
+            />
+          </div>
           <Button size="sm" className="rounded-full px-3" onClick={onApplyPrice}>
             OK
           </Button>
