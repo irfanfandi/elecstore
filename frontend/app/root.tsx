@@ -9,10 +9,9 @@ import {
 import { trpc } from "./utils/trpc";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import superjson from "superjson";
 import "./app.css";
 import Navbar from "./components/layout/navbar";
-import LeftSidebar from "./components/layout/leftSidebar";
+import * as Sentry from "@sentry/react";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +54,13 @@ export default function App() {
         url: `${import.meta.env.VITE_API_URL}trpc`, // point to your backend
       }),
     ],
+  });
+
+  Sentry.init({
+    dsn: "https://0ea18ae94845816affa5878c8855a13b@o1418496.ingest.us.sentry.io/4509416531623936",
+    // Setting this option to true will send default PII data to Sentry.
+    // For example, automatic IP address collection on events
+    sendDefaultPii: true,
   });
 
   return (
