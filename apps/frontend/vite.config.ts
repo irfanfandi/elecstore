@@ -5,12 +5,22 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), sentryVitePlugin({
-    org: "mycompany-gv",
-    project: "elecstore"
-  })],
+  plugins: [
+    tailwindcss(),
+    reactRouter(),
+    tsconfigPaths(),
+    sentryVitePlugin({
+      org: "mycompany-gv",
+      project: "elecstore",
+    }),
+  ],
 
   build: {
-    sourcemap: true
-  }
+    sourcemap: true,
+  },
+  server: {
+    proxy: {
+      "/api": "http://localhost:3001",
+    },
+  },
 });
